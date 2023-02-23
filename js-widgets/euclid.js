@@ -365,7 +365,7 @@ let euclidSketch = (s) => {
   };
 
   s.draw = () => {
-    s.background(245);
+    // s.background(245);
     let mouseOver = 0;
     seqs.forEach((seq) => {
       seq.draw();

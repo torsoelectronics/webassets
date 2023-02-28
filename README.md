@@ -1,5 +1,5 @@
 # webassets
-Repository for version control and hosting of web assets
+Public repository for hosting web assets
 
 ## Create CDN URL for hosting via jsdelivr
 Manually paste file into URL template:   

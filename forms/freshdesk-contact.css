@@ -1,3 +1,9 @@
+/* Custom */
+.form-title{
+    display: none !important;
+}
+/* Defaults */
+
 .freshwidget-button a:hover,
 .freshwidget-theme {
     text-decoration: none

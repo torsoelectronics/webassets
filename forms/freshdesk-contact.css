@@ -1,9 +1,7 @@
-/* Custom */
-.freshwidget-embedded-form {
-    display: none
-}
+
 
 /* Defaults */
+
 .freshwidget-button a:hover,
 .freshwidget-theme {
     text-decoration: none
@@ -17,6 +15,7 @@
 
 .freshwidget-container,
 .widget-ovelay {
+    display: none;
     position: fixed;
     left: 0;
     top: 0;

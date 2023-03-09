@@ -1,9 +1,9 @@
 /* Custom */
-.form-title{
+.modal-header{
     display: none !important;
 }
-/* Defaults */
 
+/* Defaults */
 .freshwidget-button a:hover,
 .freshwidget-theme {
     text-decoration: none

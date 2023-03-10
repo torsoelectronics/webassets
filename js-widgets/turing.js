@@ -1,14 +1,6 @@
 let turingSketch = (s) => {
   let penta = [0, 3, 5, 7, 9];
   let seqs = [];
-  // s.preload = () => {
-  //   mute = s.loadImage(
-  //     "https://torsoelectronics334.e.wpstage.net/wp-content/widgets/mute.svg"
-  //   );
-  //   unmute = s.loadImage(
-  //     "https://torsoelectronics334.e.wpstage.net/wp-content/widgets/unmute.svg"
-  //   );
-  // };
 
   class DrumSynth {
     constructor() {
@@ -32,7 +24,7 @@ let turingSketch = (s) => {
   }
 
   class Sampler {
-    constructor() {
+    constructor(sample) {
       Tone.loaded().then(() => {
         let snd =
           "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_tom.wav";
@@ -48,6 +40,26 @@ let turingSketch = (s) => {
       this.player.start(time);
     }
   }
+
+  class Sampler2 {
+    constructor(sample) {
+      Tone.loaded().then(() => {
+        let snd =
+          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_pluck.wav";
+        this.player = new Tone.Player(snd).toDestination();
+        this.player.volume.value = -6;
+      });
+    }
+
+    onUpdate(value, time) {
+      let midi = 69 + penta[Math.round(value * 5)];
+      this.player.playbackRate =
+        Tone.Frequency(midi, "midi").toFrequency(midi) / 440.0;
+      this.player.start(time);
+    }
+  }
+
+
 
   class ToneSynth {
     constructor() {
@@ -205,7 +217,8 @@ let turingSketch = (s) => {
     let colors = [s.color("#EE8F38"), s.color("#65D1B1"), s.color("#ED8DE9")];
 
     let generators = [
-      (v) => new DrumSynth(),
+      // (v) => new DrumSynth(),
+      (v) => new Sampler2(),
       (v) => new Sampler(),
       (v) => new ToneSynth(),
     ];

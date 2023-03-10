@@ -377,32 +377,6 @@ let euclidSketch = (s) => {
     } else {
       s.cursor(s.ARROW);
     }
-
-    // tooltip.draw();
-
-    // Labels
-    // let ps = seqs[0].pSlider;
-    // let ss = seqs[2].sSlider;
-
-    // s.noStroke();
-    // s.textSize(20);
-    // s.fill(130);
-
-    // pLabelX = ps.x + seqWidth + 40;
-    // pLabelY = ps.y -40;
-    // s.text('Pulses', pLabelX, pLabelY);
-
-    // sLabelX = ss.x - 120;
-    // sLabelY = ss.y - 20;
-    // s.text('Steps', sLabelX, sLabelY);
-
-    // s.strokeWeight(2);
-    // s.stroke(160);
-    // s.noFill();
-    // // s.curve(pLabelX- 10, pLabelY-10,pLabelX+5,pLabelY+10, ps.x + seqWidth-5, ps.y+8, pLabelX-10, pLabelY-20)
-    // // s.curve(sLabelX- 10, sLabelY-10,sLabelX+5,sLabelY+5, ss.x + seqWidth-5, ss.y+10, sLabelX-10, sLabelY-20)
-    // s.line(pLabelX+20,pLabelY+5, ps.x + seqWidth-5, ps.y+8)
-    // s.line(sLabelX+30,sLabelY+5, ss.x-5, ss.y+8)
   };
 
   s.mouseClicked = () => {

@@ -10,47 +10,49 @@ let euclidSketch = (s) => {
 
   let defaultSteps = 8;
   let defaultPulses = 3;
+  const euclidVoices = [
+    {
+      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
+      volume: -3,
+      fallbackMidi: 36,
+    },
+    {
+      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav',
+      volume: -5,
+      fallbackMidi: 43,
+    },
+    {
+      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_kick.wav',
+      volume: -5,
+      fallbackMidi: 48,
+    },
+  ];
 
   class DrumSynth {
-    constructor() {
-      let snds = [
-        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
-        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
-        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
-      ];
-      this.players = snds.map((url) =>
-        new Tone.Player({
-          url: url,
-          onerror: (error) => {
-            console.error('euclid sample load failed', url, error);
-          },
-        }).toDestination()
-      );
-      this.players[0].volume.value = -3;
-      this.players[1].volume.value = -3;
-      this.players[2].volume.value = -6;
+    constructor(voice) {
+      this.player = new Tone.Player({
+        url: voice.url,
+        onerror: (error) => {
+          console.error('euclid sample load failed', voice.url, error);
+        },
+      }).toDestination();
+      this.player.volume.value = voice.volume;
       this.fallback = new Tone.MembraneSynth({
         envelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.05 },
         octaves: 6,
         pitchDecay: 0.03,
       }).toDestination();
       this.fallback.volume.value = -8;
+      this.fallbackMidi = voice.fallbackMidi;
     }
 
     onUpdate(value, time) {
-      let clamped = Math.max(0, Math.min(value, 0.999999));
-      let sel = Math.min(
-        this.players.length - 1,
-        Math.floor(clamped * this.players.length)
-      );
-      let player = this.players[sel];
-      if (player && player.loaded) {
-        player.start(time);
+      if (this.player && this.player.loaded) {
+        this.player.start(time);
         return;
       }
-      let fallbackMidi = 36 + sel * 8;
       this.fallback.triggerAttackRelease(
-        Tone.Frequency(fallbackMidi, 'midi'),
+        Tone.Frequency(this.fallbackMidi, 'midi'),
         '16n',
         time
       );
@@ -163,7 +165,7 @@ let euclidSketch = (s) => {
     constructor(x, y, steps, pulses, generator, pitch, color) {
       this.x = x;
       this.y = y;
-      this.generator = new DrumSynth();
+      this.generator = generator;
       this.c = color;
       this.clk = 0;
       this.steps = steps;
@@ -356,6 +358,7 @@ let euclidSketch = (s) => {
     tooltip = new Tooltip(0, 350);
 
     for (let i = 0; i < numSeqs; i++) {
+      let voice = euclidVoices[i % euclidVoices.length];
       seqs.push(
         new Euclid(
           numSeqs == 1
@@ -364,7 +367,7 @@ let euclidSketch = (s) => {
           seqWidth / 2,
           defaultSteps,
           defaultPulses,
-          new DrumSynth(),
+          new DrumSynth(voice),
           i / 3.0,
           colors[i]
         )

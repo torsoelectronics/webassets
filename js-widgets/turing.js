@@ -1,5 +1,6 @@
 let turingSketch = (s) => {
-  let penta = [0, 3, 5, 7, 9];
+  const harmonizedScale = [0, 3, 5, 7, 10];
+  const harmonizedRootMidi = 57;
   let seqs = [];
 
   function clampIndex(value, length) {
@@ -7,10 +8,13 @@ let turingSketch = (s) => {
     return Math.min(length - 1, Math.floor(clamped * length));
   }
 
-  function pentaFrequency(value, baseMidi) {
+  function scaleFrequency(value, octaveOffset = 0) {
     let clamped = Math.max(0, Math.min(value, 1));
-    let idx = Math.min(penta.length - 1, Math.round(clamped * (penta.length - 1)));
-    let midi = baseMidi + penta[idx];
+    let idx = Math.min(
+      harmonizedScale.length - 1,
+      Math.round(clamped * (harmonizedScale.length - 1))
+    );
+    let midi = harmonizedRootMidi + octaveOffset + harmonizedScale[idx];
     return Tone.Frequency(midi, "midi").toFrequency();
   }
 
@@ -64,7 +68,7 @@ let turingSketch = (s) => {
     }
 
     onUpdate(value, time) {
-      let frequency = pentaFrequency(value, 69);
+      let frequency = scaleFrequency(value, 12);
       if (this.player && this.player.loaded) {
         this.player.playbackRate = frequency / 440.0;
         this.player.start(time);
@@ -87,7 +91,7 @@ let turingSketch = (s) => {
     }
 
     onUpdate(value, time) {
-      let frequency = pentaFrequency(value, 69);
+      let frequency = scaleFrequency(value, 12);
       if (this.player && this.player.loaded) {
         this.player.playbackRate = frequency / 440.0;
         this.player.start(time);
@@ -107,7 +111,7 @@ let turingSketch = (s) => {
     }
 
     onUpdate(value, time) {
-      let frequency = pentaFrequency(value, 60);
+      let frequency = scaleFrequency(value, 0);
       this.osc.triggerAttackRelease(
         frequency,
         "8n",

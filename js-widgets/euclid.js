@@ -10,19 +10,23 @@ let euclidSketch = (s) => {
 
   let defaultSteps = 8;
   let defaultPulses = 3;
+  const euclidAssetBase =
+    document.currentScript && document.currentScript.src
+      ? new URL('assets/', document.currentScript.src).toString()
+      : 'https://cdn.jsdelivr.net/gh/torsoelectronics/webassets@main/js-widgets/assets/';
   const euclidVoices = [
     {
-      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
+      url: `${euclidAssetBase}web_sample_perc_low.wav`,
       volume: -3,
       fallbackMidi: 36,
     },
     {
-      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
+      url: `${euclidAssetBase}web_sample_perc_mini.wav`,
       volume: -3,
       fallbackMidi: 43,
     },
     {
-      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
+      url: `${euclidAssetBase}web_sample_perc_high.wav`,
       volume: -6,
       fallbackMidi: 48,
     },

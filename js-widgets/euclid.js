@@ -15,9 +15,9 @@ let euclidSketch = (s) => {
     constructor() {
       Tone.loaded().then(() => {
         let snds = [
-          'https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_perc_low.wav',
-          'https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_perc_mini.wav',
-          'https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_perc_high.wav',
+          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
+          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
+          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
         ];
         this.players = snds.map((p) => new Tone.Player(p).toDestination());
         this.players[0].volume.value = -3;

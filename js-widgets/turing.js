@@ -6,11 +6,11 @@ let turingSketch = (s) => {
     constructor() {
       Tone.loaded().then(() => {
         let snds = [
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_tom.wav",
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_pluck.wav",
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_kick.wav",
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_hats.wav",
-          "https://torsoelectronics.com/downloads/t-1/assets/909/CLAP2.WAV",
+          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav",
+          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_pluck.wav",
+          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_kick.wav",
+          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_hats.wav",
+          "https://downloads.torsoelectronics.com/t-1/assets/909/CLAP2.WAV",
         ];
         this.players = snds.map((p) => new Tone.Player(p).toDestination());
         this.players[3].volume.param = -32;

@@ -2,60 +2,98 @@ let turingSketch = (s) => {
   let penta = [0, 3, 5, 7, 9];
   let seqs = [];
 
+  function clampIndex(value, length) {
+    let clamped = Math.max(0, Math.min(value, 0.999999));
+    return Math.min(length - 1, Math.floor(clamped * length));
+  }
+
+  function pentaFrequency(value, baseMidi) {
+    let clamped = Math.max(0, Math.min(value, 1));
+    let idx = Math.min(penta.length - 1, Math.round(clamped * (penta.length - 1)));
+    let midi = baseMidi + penta[idx];
+    return Tone.Frequency(midi, "midi").toFrequency();
+  }
+
+  function createPlayer(url, volume) {
+    let player = new Tone.Player({
+      url: url,
+      onerror: (error) => {
+        console.error("turing sample load failed", url, error);
+      },
+    }).toDestination();
+    player.volume.value = volume;
+    return player;
+  }
+
   class DrumSynth {
     constructor() {
-      Tone.loaded().then(() => {
-        let snds = [
-          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav",
-          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_pluck.wav",
-          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_kick.wav",
-          "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_hats.wav",
-          "https://downloads.torsoelectronics.com/t-1/assets/909/CLAP2.WAV",
-        ];
-        this.players = snds.map((p) => new Tone.Player(p).toDestination());
-        this.players[3].volume.param = -32;
-      });
+      let snds = [
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav",
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_pluck.wav",
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_kick.wav",
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_hats.wav",
+        "https://downloads.torsoelectronics.com/t-1/assets/909/CLAP2.WAV",
+      ];
+      this.players = snds.map((url) => createPlayer(url, 0));
+      this.players[3].volume.value = -32;
+      this.fallback = new Tone.NoiseSynth({
+        noise: { type: "white" },
+        envelope: { attack: 0.001, decay: 0.08, sustain: 0.0, release: 0.02 },
+      }).toDestination();
+      this.fallback.volume.value = -14;
     }
 
     onUpdate(value, time) {
-      let sel = Math.floor(value * this.players.length);
-      this.players[sel].start(time);
+      let sel = clampIndex(value, this.players.length);
+      let player = this.players[sel];
+      if (player && player.loaded) {
+        player.start(time);
+        return;
+      }
+      this.fallback.triggerAttackRelease("16n", time);
     }
   }
 
   class Sampler {
     constructor(sample) {
-      Tone.loaded().then(() => {
-        let snd =
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_tom.wav";
-        this.player = new Tone.Player(snd).toDestination();
-        this.player.volume.value = -6;
-      });
+      let snd =
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav";
+      this.player = createPlayer(snd, -6);
+      this.fallback = new Tone.PluckSynth().toDestination();
+      this.fallback.volume.value = -8;
     }
 
     onUpdate(value, time) {
-      let midi = 69 + penta[Math.round(value * 5)];
-      this.player.playbackRate =
-        Tone.Frequency(midi, "midi").toFrequency(midi) / 440.0;
-      this.player.start(time);
+      let frequency = pentaFrequency(value, 69);
+      if (this.player && this.player.loaded) {
+        this.player.playbackRate = frequency / 440.0;
+        this.player.start(time);
+        return;
+      }
+      this.fallback.triggerAttackRelease(frequency, "8n", time);
     }
   }
 
   class Sampler2 {
     constructor(sample) {
-      Tone.loaded().then(() => {
-        let snd =
-          "https://torsoelectronics.com/downloads/t-1/assets/web_samples/web_sample_pluck.wav";
-        this.player = new Tone.Player(snd).toDestination();
-        this.player.volume.value = -6;
-      });
+      let snd =
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_pluck.wav";
+      this.player = createPlayer(snd, -6);
+      this.fallback = new Tone.Synth({
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.05 },
+      }).toDestination();
+      this.fallback.volume.value = -10;
     }
 
     onUpdate(value, time) {
-      let midi = 69 + penta[Math.round(value * 5)];
-      this.player.playbackRate =
-        Tone.Frequency(midi, "midi").toFrequency(midi) / 440.0;
-      this.player.start(time);
+      let frequency = pentaFrequency(value, 69);
+      if (this.player && this.player.loaded) {
+        this.player.playbackRate = frequency / 440.0;
+        this.player.start(time);
+        return;
+      }
+      this.fallback.triggerAttackRelease(frequency, "8n", time);
     }
   }
 
@@ -63,17 +101,15 @@ let turingSketch = (s) => {
 
   class ToneSynth {
     constructor() {
-      Tone.loaded().then(() => {
-        const reverb = new Tone.Reverb(0.5).toDestination();
-        this.osc = new Tone.PluckSynth().toDestination().connect(reverb);
-        this.osc.volume.value = 4;
-      });
+      const reverb = new Tone.Reverb(0.5).toDestination();
+      this.osc = new Tone.PluckSynth().connect(reverb);
+      this.osc.volume.value = 4;
     }
 
     onUpdate(value, time) {
-      let midi = 60 + penta[Math.round(value * 5)];
+      let frequency = pentaFrequency(value, 60);
       this.osc.triggerAttackRelease(
-        Tone.Frequency(midi, "midi").toFrequency(midi),
+        frequency,
         "8n",
         time
       );

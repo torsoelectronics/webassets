@@ -13,22 +13,47 @@ let euclidSketch = (s) => {
 
   class DrumSynth {
     constructor() {
-      Tone.loaded().then(() => {
-        let snds = [
-          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
-          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
-          'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
-        ];
-        this.players = snds.map((p) => new Tone.Player(p).toDestination());
-        this.players[0].volume.value = -3;
-        this.players[1].volume.value = -3;
-        this.players[2].volume.value = -6;
-      });
+      let snds = [
+        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_low.wav',
+        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
+        'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
+      ];
+      this.players = snds.map((url) =>
+        new Tone.Player({
+          url: url,
+          onerror: (error) => {
+            console.error('euclid sample load failed', url, error);
+          },
+        }).toDestination()
+      );
+      this.players[0].volume.value = -3;
+      this.players[1].volume.value = -3;
+      this.players[2].volume.value = -6;
+      this.fallback = new Tone.MembraneSynth({
+        envelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.05 },
+        octaves: 6,
+        pitchDecay: 0.03,
+      }).toDestination();
+      this.fallback.volume.value = -8;
     }
 
     onUpdate(value, time) {
-      let sel = Math.floor(value * this.players.length);
-      this.players[sel].start(time);
+      let clamped = Math.max(0, Math.min(value, 0.999999));
+      let sel = Math.min(
+        this.players.length - 1,
+        Math.floor(clamped * this.players.length)
+      );
+      let player = this.players[sel];
+      if (player && player.loaded) {
+        player.start(time);
+        return;
+      }
+      let fallbackMidi = 36 + sel * 8;
+      this.fallback.triggerAttackRelease(
+        Tone.Frequency(fallbackMidi, 'midi'),
+        '16n',
+        time
+      );
     }
   }
 

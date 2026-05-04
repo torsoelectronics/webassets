@@ -9,11 +9,7 @@ let turingSketch = (s) => {
   }
 
   function scaleFrequency(value, octaveOffset = 0) {
-    let clamped = Math.max(0, Math.min(value, 1));
-    let idx = Math.min(
-      harmonizedScale.length - 1,
-      Math.round(clamped * (harmonizedScale.length - 1))
-    );
+    let idx = clampIndex(value, harmonizedScale.length);
     let midi = harmonizedRootMidi + octaveOffset + harmonizedScale[idx];
     return Tone.Frequency(midi, "midi").toFrequency();
   }
@@ -103,23 +99,28 @@ let turingSketch = (s) => {
 
 
 
-  class ToneSynth {
-    constructor() {
-      const reverb = new Tone.Reverb(0.5).toDestination();
-      this.osc = new Tone.PluckSynth().connect(reverb);
-      this.osc.volume.value = 4;
+  class Sampler3 {
+    constructor(sample) {
+      let snd =
+        "https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav";
+      this.player = createPlayer(snd, -8);
+      this.fallback = new Tone.Synth({
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.001, decay: 0.15, sustain: 0.0, release: 0.04 },
+      }).toDestination();
+      this.fallback.volume.value = -12;
     }
 
     onUpdate(value, time) {
-      let frequency = scaleFrequency(value, 0);
-      this.osc.triggerAttackRelease(
-        frequency,
-        "8n",
-        time
-      );
+      let frequency = scaleFrequency(value, 12);
+      if (this.player && this.player.loaded) {
+        this.player.playbackRate = frequency / 440.0;
+        this.player.start(time);
+        return;
+      }
+      this.fallback.triggerAttackRelease(frequency, "8n", time);
     }
   }
-
   class Sequence extends Grid {
     constructor(options) {
       super({
@@ -260,7 +261,7 @@ let turingSketch = (s) => {
       // (v) => new DrumSynth(),
       (v) => new Sampler2(),
       (v) => new Sampler(),
-      (v) => new ToneSynth(),
+      (v) => new Sampler3(),
     ];
 
     for (let i = 0; i < numSeqs; ++i) {

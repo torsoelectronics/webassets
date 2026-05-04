@@ -17,13 +17,13 @@ let euclidSketch = (s) => {
       fallbackMidi: 36,
     },
     {
-      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_tom.wav',
-      volume: -5,
+      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_mini.wav',
+      volume: -3,
       fallbackMidi: 43,
     },
     {
-      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_kick.wav',
-      volume: -5,
+      url: 'https://downloads.torsoelectronics.com/t-1/assets/web_samples/web_sample_perc_high.wav',
+      volume: -6,
       fallbackMidi: 48,
     },
   ];

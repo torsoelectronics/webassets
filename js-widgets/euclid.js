@@ -10,10 +10,16 @@ let euclidSketch = (s) => {
 
   let defaultSteps = 8;
   let defaultPulses = 3;
+  const euclidScriptTag =
+    document.currentScript ||
+    Array.from(document.getElementsByTagName('script')).find(
+      (script) =>
+        script.src && script.src.includes('/js-widgets/euclid.js')
+    );
   const euclidAssetBase =
-    document.currentScript && document.currentScript.src
-      ? new URL('assets/', document.currentScript.src).toString()
-      : 'https://cdn.jsdelivr.net/gh/torsoelectronics/webassets@main/js-widgets/assets/';
+    euclidScriptTag && euclidScriptTag.src
+      ? new URL('assets/', euclidScriptTag.src).toString()
+      : 'https://cdn.jsdelivr.net/gh/torsoelectronics/webassets@bbc59a4ab8191ca2841e34530d07f283fca46e67/js-widgets/assets/';
   const euclidVoices = [
     {
       url: `${euclidAssetBase}web_sample_perc_low.wav`,

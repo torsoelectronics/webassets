@@ -24,48 +24,36 @@ let euclidSketch = (s) => {
     {
       url: `${euclidAssetBase}web_sample_perc_low.wav`,
       volume: -3,
-      fallbackMidi: 36,
     },
     {
       url: `${euclidAssetBase}web_sample_perc_mini.wav`,
       volume: -3,
-      fallbackMidi: 43,
     },
     {
       url: `${euclidAssetBase}web_sample_perc_high.wav`,
       volume: -6,
-      fallbackMidi: 48,
     },
   ];
 
   class DrumSynth {
     constructor(voice) {
+      this.playerLoaded = false;
       this.player = new Tone.Player({
         url: voice.url,
+        onload: () => {
+          this.playerLoaded = true;
+        },
         onerror: (error) => {
           console.error('euclid sample load failed', voice.url, error);
         },
       }).toDestination();
       this.player.volume.value = voice.volume;
-      this.fallback = new Tone.MembraneSynth({
-        envelope: { attack: 0.001, decay: 0.2, sustain: 0.0, release: 0.05 },
-        octaves: 6,
-        pitchDecay: 0.03,
-      }).toDestination();
-      this.fallback.volume.value = -8;
-      this.fallbackMidi = voice.fallbackMidi;
     }
 
     onUpdate(value, time) {
-      if (this.player && this.player.loaded) {
+      if (this.player && (this.playerLoaded || this.player.loaded)) {
         this.player.start(time);
-        return;
       }
-      this.fallback.triggerAttackRelease(
-        Tone.Frequency(this.fallbackMidi, 'midi'),
-        '16n',
-        time
-      );
     }
   }
 
